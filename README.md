@@ -7,13 +7,11 @@ This is an implementation of code from [Openreview Paper](https://openreview.net
 Please cite the paper if you are using the WaveMix model
 
 ```
-@inproceedings{
-anonymous2022wavemix,
+@misc{
+p2022wavemix,
 title={WaveMix: Multi-Resolution Token Mixing for Images},
-author={Anonymous},
-booktitle={Submitted to The Tenth International Conference on Learning Representations },
+author={Pranav Jeevan P and Amit Sethi},
 year={2022},
-url={https://openreview.net/forum?id=tBoSm4hUWV},
-note={under review}
+url={https://openreview.net/forum?id=tBoSm4hUWV}
 }
 ```

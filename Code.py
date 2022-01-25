@@ -356,23 +356,25 @@ class DWTForward(nn.Module):
 
         return ll, yh
 
+from numpy.lib.function_base import hamming
+
 class Waveblock(nn.Module):
     def __init__(
         self,
         *,
-        mult_dim = 32,
+        mult = 2,
         ff_channel = 16,
         final_dim = 16,
         dropout = 0.5,
     ):
         super().__init__()
         
-        
+
         self.feedforward = nn.Sequential(
-                nn.Conv2d(final_dim * 4, mult_dim,1),
+                nn.Conv2d(final_dim, final_dim*mult,1),
                 nn.GELU(),
                 nn.Dropout(dropout),
-                nn.Conv2d(mult_dim, ff_channel, 1),
+                nn.Conv2d(final_dim*mult, ff_channel, 1),
                 nn.Dropout(dropout)
             )
       
@@ -380,59 +382,76 @@ class Waveblock(nn.Module):
         self.ff2 = nn.ConvTranspose2d(ff_channel, int(final_dim/4), 6, stride=4, padding=1)
         self.ff3 = nn.ConvTranspose2d(ff_channel, int(final_dim/4), 10, stride=8, padding=1)
         self.ff4 = nn.ConvTranspose2d(ff_channel, int(final_dim/4), 18, stride=16, padding=1)
+        # self.ff5 = nn.ConvTranspose2d(ff_channel, int(final_dim/5), 34, stride=32, padding=1)
+
 
         self.depthconv = nn.Sequential(
+            
             nn.Conv2d(final_dim, final_dim, 5, groups=final_dim, padding="same"),
             nn.GELU(),
-            nn.BatchNorm2d(final_dim)
+            nn.BatchNorm2d(final_dim),
         )
+
+        self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
         
         
     def forward(self, x):
         b, c, h, w = x.shape
         
+        x = self.reduction(x)
+
         xf1 = DWTForward(J=1, mode='zero', wave='db1').cuda()
         xf2 = DWTForward(J=2, mode='zero', wave='db1').cuda()
         xf3 = DWTForward(J=3, mode='zero', wave='db1').cuda()
         xf4 = DWTForward(J=4, mode='zero', wave='db1').cuda()
+        # xf5 = DWTForward(J=5, mode='zero', wave='db1').cuda()
         
         Y1, Yh = xf1(x)
         Y2, Yh = xf2(x)
         Y3, Yh = xf3(x)
         Y4, Yh = xf4(x)
+        # Y5, Yh = xf5(x)
 
-        x1 = torch.reshape(Yh[0], (b, c*3, int(h/2), int(h/2)))
-        x2 = torch.reshape(Yh[1], (b, c*3, int(h/4), int(w/4)))
-        x3 = torch.reshape(Yh[2], (b, c*3, int(h/8), int(w/8)))
-        x4 = torch.reshape(Yh[3], (b, c*3, int(h/16), int(w/16)))
+
+        x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(h/2)))
+        x2 = torch.reshape(Yh[1], (b, int(c*3/4), int(h/4), int(w/4)))
+        x3 = torch.reshape(Yh[2], (b, int(c*3/4), int(h/8), int(w/8)))
+        x4 = torch.reshape(Yh[3], (b, int(c*3/4), int(h/16), int(w/16)))
+        # x5 = torch.reshape(Yh[4], (b, int(c*3/4), int(h/32), int(w/32)))
+
 
         x1 = torch.cat((Y1,x1), dim = 1)
         x2 = torch.cat((Y2,x2), dim = 1)
         x3 = torch.cat((Y3,x3), dim = 1)
         x4 = torch.cat((Y4,x4), dim = 1)
+        # x5 = torch.cat((Y5,x5), dim = 1)
 
         x1 = self.feedforward(x1)
         x2 = self.feedforward(x2)
         x3 = self.feedforward(x3)
         x4 = self.feedforward(x4)
+        # x5 = self.feedforward(x5)
 
         x1 = self.ff1(x1)
         x2 = self.ff2(x2)
         x3 = self.ff3(x3)
         x4 = self.ff4(x4)
+        # x5 = self.ff5(x5)
         
         x = torch.cat((x1,x2,x3,x4), dim = 1)
+        # x = torch.cat((x1,x2,x3), dim = 1)
+        # x = torch.cat((x1,x2), dim = 1)
         x = self.depthconv(x)
         
         return x
-
+        
 class WaveMix(nn.Module):
     def __init__(
         self,
         *,
         num_classes,
         depth,
-        mult_dim = 32,
+        mult = 2,
         ff_channel = 16,
         final_dim = 16,
         dropout = 0.,
@@ -441,7 +460,7 @@ class WaveMix(nn.Module):
         
         self.layers = nn.ModuleList([])
         for _ in range(depth):
-            self.layers.append(Waveblock(mult_dim = mult_dim, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+            self.layers.append(Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
         
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -450,7 +469,7 @@ class WaveMix(nn.Module):
         )
 
         self.conv = nn.Sequential(
-            nn.Conv2d(3, int(final_dim/2), 3, 2, 1),
+            nn.Conv2d(3, int(final_dim/2), 3, 1, 1),
             nn.Conv2d(int(final_dim/2), final_dim, 3, 1, 1)
         )
 
@@ -467,10 +486,10 @@ class WaveMix(nn.Module):
         return out
 
 model = WaveMix(
-    num_classes = 10,
-    depth = 6,
-    mult_dim = 1024,
-    ff_channel = 1024,
-    final_dim = 1024,
+    num_classes = 1000,
+    depth = 7,
+    mult = 2,
+    ff_channel = 256,
+    final_dim = 256,
     dropout = 0.5
 )

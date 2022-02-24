@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#When using 4 level DWT
 import torch
 import torch.nn.functional as F
 import numpy as np

@@ -7,6 +7,12 @@ from torch.autograd import Function
 import pywt
 import torch.nn as nn
 import functools
+!pip install einops
+from math import ceil
+import pywt
+
+from einops import rearrange, repeat
+from einops.layers.torch import Rearrange
 
 def sfb1d(lo, hi, g0, g1, mode='zero', dim=-1):
     """ 1D synthesis filter bank of an image tensor

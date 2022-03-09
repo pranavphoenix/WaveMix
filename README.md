@@ -3,6 +3,8 @@
 
 ## Resource-efficient Token Mixing for Images using 2D Discrete Wavelet Transform 
 
+Although certain vision transformer (ViT) and CNN architectures generalize well on vision tasks, it is often impractical to use them on green, edge, or desktop computing due to their computational requirements for training and even testing. We present WaveMix as an alternative neural architecture that uses a multi-scale 2D discrete wavelet transform (DWT) for spatial token mixing. Unlike ViTs, WaveMix neither unrolls the image nor requires self-attention of quadratic complexity. Additionally, DWT introduces another inductive bias -- besides convolutional filtering -- to utilize the 2D structure of an image to improve generalization. The multi-scale nature of the DWT also reduces the requirement for a deeper architecture compared to the CNNs, as the latter relies on pooling for partial spatial mixing. WaveMix models show generalization that is competitive with ViTs, CNNs, and token mixers on several datasets while requiring lower GPU RAM (training and testing), number of computations, and storage.
+
 This is an implementation of code from [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV) and [ArXiv Paper](https://arxiv.org/abs/2203.03689)
 
 

@@ -9,7 +9,7 @@ Although certain vision transformer (ViT) and CNN architectures generalize well 
 | Task                       | Model            | Parameters |
 |----------------------------|------------------|------------|
 | 99% Accu. in MNIST         | WaveMix Lite-8/3 | 4056       |
-| 90% Accu. in Fashion MNIST |                  |            |
+| 90% Accu. in Fashion MNIST | WaveMix Lite-8/5 | 7156       |
 
 
 This is an implementation of code from [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV) and [ArXiv Paper](https://arxiv.org/abs/2203.03689)

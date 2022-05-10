@@ -8,10 +8,12 @@ Although certain vision transformer (ViT) and CNN architectures generalize well 
 ### Parameter Efficiency
 | Task                         | Model                                           | Parameters |
 |------------------------------|-------------------------------------------------|------------|
-| 99% Accu. in MNIST           | WaveMix Lite-8/3                                | 4056       |
+| 99% Accu. in MNIST           | WaveMix Lite-8/10                               | 3566       |
 | 90% Accu. in Fashion MNIST   | WaveMix Lite-8/5                                | 7156       |
-| 80% Accu. in CIFAR-10        | WaveMix Lite-32/4 (ff=16, mult=1, dropout=0.25) | 45962      |
-| 90% Accu. in CIFAR-10        | WaveMix Lite-64/6                               | 520106     |                                          
+| 80% Accu. in CIFAR-10        | WaveMix Lite-32/7                               | 37058      |
+| 90% Accu. in CIFAR-10        | WaveMix Lite-64/6                               | 520106     |   
+
+The high parameter efficiency is obtained by replacing Deconvolution layers with Upsampling
 
 This is an implementation of code from [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV) and [ArXiv Paper](https://arxiv.org/abs/2203.03689)
 

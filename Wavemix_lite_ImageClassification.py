@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from torch.autograd import Function
-import pywt
+!pip install pywavelets
 import torch.nn as nn
 import functools
 !pip install einops
@@ -397,7 +397,7 @@ class Waveblock(nn.Module):
         
         Y1, Yh = xf1(x)
         
-        x = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(h/2)))
+        x = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
         
         x = torch.cat((Y1,x), dim = 1)
         

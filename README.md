@@ -15,7 +15,8 @@ Gains in the ability to generalize on image analysis tasks for neural networks h
 
 The high parameter efficiency is obtained by replacing Deconvolution layers with Upsampling
 
-This is an implementation of code from [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV) and [ArXiv Paper](https://arxiv.org/abs/2203.03689)
+This is an implementation of code from the following papers : [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV), [ArXiv Paper 1](https://arxiv.org/abs/2203.03689), [ArXiv Paper 2](https://arxiv.org/abs/2205.14375)
+
 
 
 Please cite the following papers if you are using the WaveMix model

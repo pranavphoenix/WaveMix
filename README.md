@@ -37,4 +37,23 @@ url={https://openreview.net/forum?id=tBoSm4hUWV}
     archivePrefix={arXiv},
     primaryClass={cs.CV}
 }
+
+@misc{https://doi.org/10.48550/arxiv.2205.14375,
+  doi = {10.48550/ARXIV.2205.14375},
+  
+  url = {https://arxiv.org/abs/2205.14375},
+  
+  author = {Jeevan, Pranav and Viswanathan, Kavitha and Sethi, Amit},
+  
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), Artificial Intelligence (cs.AI), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences, I.2.10; I.4.0; I.4.1; I.4.2; I.4.6; I.4.7; I.4.8; I.4.9; I.4.10; I.2.10; I.5.1; I.5.2; I.5.4},
+  
+  title = {WaveMix-Lite: A Resource-efficient Neural Network for Image Analysis},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+
 ```

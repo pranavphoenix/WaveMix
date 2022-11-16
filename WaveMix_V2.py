@@ -378,7 +378,6 @@ class Waveblock(nn.Module):
     ):
         super().__init__()
         
-      
         self.feedforward1 = nn.Sequential(
                 nn.Conv2d(final_dim + int(final_dim/2), final_dim*mult,1),
                 nn.GELU(),
@@ -406,13 +405,12 @@ class Waveblock(nn.Module):
                 nn.BatchNorm2d(int(final_dim/2))          
             )
 
-
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
         
         
     def forward(self, x):
         b, c, h, w = x.shape
-  
+        
         x = self.reduction(x)
         
         Y1, Yh = xf1(x)
@@ -438,7 +436,7 @@ class Waveblock(nn.Module):
 
         x1 = torch.cat((x1,x2), dim = 1)
         x = self.feedforward1(x1)
-    
+        
         return x
 
 

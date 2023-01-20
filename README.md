@@ -26,6 +26,11 @@
 
 Gains in the ability to generalize on image analysis tasks for neural networks have come at the cost of increased number of parameters and layers, dataset sizes, training and test computations, and GPU RAM. We introduce a new architecture -- WaveMix-Lite -- that can generalize on par with contemporary transformers and convolutional neural networks (CNNs) while needing fewer resources. WaveMix-Lite uses 2D-discrete wavelet transform to efficiently mix spatial information from pixels. WaveMix-Lite seems to be a versatile and scalable architectural framework that can be used for multiple vision tasks, such as image classification and semantic segmentation, without requiring significant architectural changes, unlike transformers and CNNs. It is able to meet or exceed several accuracy benchmarks while training on a single GPU. For instance, it achieves state-of-the-art accuracy on five EMNIST datasets, outperforms CNNs and transformers in ImageNet-1K (64 x 64 images), and achieves an mIoU of 75.32 % on Cityscapes validation set, while using less than one-fifth the number parameters and half the GPU RAM of comparable CNNs or transformers. Our experiments show that while the convolutional elements of neural architectures exploit the properties of shift-invariance and sparseness of edges in images, new types of layers (e.g., wavelet transform) can exploit additional properties of images, such as scale-invariance and finite spatial extents of objects.
 
+| Task                  | Dataset     | Metric   | Value  |
+|-----------------------|-------------|----------|--------|
+| Semantic Segmentation | Cityscapes  | mIoU     | 82.60% |
+| Image Classification  | ImageNet-1k | Accuracy | 74.93% |
+
 ### Parameter Efficiency
 | Task                         | Model                                           | Parameters |
 |------------------------------|-------------------------------------------------|------------|

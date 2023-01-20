@@ -1,4 +1,4 @@
-# With 2 skip connections from input convolution layers to output deconvolution layers
+
 
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -630,31 +630,30 @@ class WaveMix(nn.Module):
 
             self.layers = nn.ModuleList([]) 
             for _ in range(depth): 
-                self.layers.append(Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))                    
-            self.deconv1 = nn.ConvTranspose2d(final_dim,int(final_dim/2), 4, stride=2, padding=1)
-            self.deconv2 = nn.ConvTranspose2d(int(final_dim/2)+int(final_dim/4), int(final_dim/4), 4, stride=2, padding=1)
-              #  nn.Conv2d(int(final_dim/4), num_classes, 1)
+                self.layers.append(Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+                
+            self.expand = nn.Sequential(
+              nn.ConvTranspose2d(final_dim , int(final_dim/2), 4, stride=2, padding=1),
+              nn.ConvTranspose2d(int(final_dim/2), int(final_dim/4), 4, stride=2, padding=1),
+              nn.Conv2d(int(final_dim/4), num_classes, 1) 
+            )
             
 
-            self.conv1 = nn.Conv2d(3, int(final_dim/2), 3, 2, 1)
-            self.conv2 = nn.Conv2d(int(final_dim/2),final_dim, 3, 2, 1)
+            self.conv = nn.Sequential(
+              nn.Conv2d(3, int(final_dim/2), 3, 2, 1),
+              nn.Conv2d(int(final_dim/2),final_dim, 3, 2, 1)
+            )
             
-            self.final = nn.Conv2d(int(final_dim/4)+3, num_classes, 1) 
-            self.compress = nn.Conv2d(int(final_dim/2), int(final_dim/4), 1, 1) 
+
 
     def forward(self, img):
-        x1 = self.conv1(img)
-        x = self.conv2(x1)
-        x1 = self.compress(x1)
+        x = self.conv(img)
 
         for attn in self.layers:
             x = attn(x) + x
 
-        out = self.deconv1(x)
-        out = torch.cat((out, x1), dim=1)
-        out = self.deconv2(out)
-        out = torch.cat((out, img), dim=1)
-        out = self.final(out)
+        out = self.expand(x)
+        
         return out
         
            

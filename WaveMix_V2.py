@@ -463,6 +463,13 @@ class WaveMix(nn.Module):
             Rearrange('... () () -> ...'),
             nn.Linear(1024, num_classes)
         )
+        
+#         Self.conv can be strided convolutions too
+#         self.conv = nn.Sequential(
+#             nn.Conv2d(3, int(final_dim/2), 3, 2, 1),
+#             nn.Conv2d(int(final_dim/2), final_dim, 3, 2, 1),
+#             )
+        
 
         self.conv = nn.Sequential(
             nn.Conv2d(3, int(final_dim/4),3, 1, 1),
@@ -472,7 +479,7 @@ class WaveMix(nn.Module):
             nn.BatchNorm2d(final_dim)
             )
 
-        self.final = nn.Conv2d(final_dim, 1024, 1, 1)
+        self.final = nn.Conv2d(final_dim, 1024, 1, 1)  # The final embedding to be choosen based on number of classes
 
       
 

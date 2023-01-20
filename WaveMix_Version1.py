@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+# Older version of WaveMix model, for better performance, use the Version 2
 #When using 4 level DWT
 import torch
 import torch.nn.functional as F

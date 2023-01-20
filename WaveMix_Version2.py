@@ -1,4 +1,4 @@
-
+# Written for image classification, but backbone can used for other tasks by changing the final pool layer
 import torch
 import torch.nn.functional as F
 import numpy as np

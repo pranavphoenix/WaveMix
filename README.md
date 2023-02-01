@@ -29,7 +29,7 @@ To allow image analysis in resource-constrained scenarios without compromising g
 
 | Task                  | Dataset     | Metric   | Value  |
 |-----------------------|-------------|----------|--------|
-| Semantic Segmentation | Cityscapes  | mIoU     | 82.60% |
+| Semantic Segmentation | Cityscapes  | mIoU     | 82.70% |
 | Image Classification  | ImageNet-1k | Accuracy | 74.93% |
 
 ### Parameter Efficiency

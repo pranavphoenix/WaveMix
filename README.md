@@ -20,11 +20,12 @@
 ## Resource-efficient Token Mixing for Images using 2D Discrete Wavelet Transform 
 
 ### WaveMix Architecture
-![image](https://user-images.githubusercontent.com/15833382/201499399-1137bced-61e4-4d3f-9d6c-5b8ba3d43984.png)
-### WaveMix-Lite
-![image](https://user-images.githubusercontent.com/15833382/172208483-42e6feaa-ff0a-4ccb-8663-f36d25c28d33.png)
+![image](https://user-images.githubusercontent.com/15833382/226090639-b4571494-7d2d-4bcb-81e3-127916339dfe.png)
 
-To allow image analysis in resource-constrained scenarios without compromising generalizability, we introduce WaveMix -- a novel and flexible neural framework that reduces the GPU RAM (memory) and compute (latency) compared to CNNs and transformers. In addition to using convolutional layers that exploit shift-invariant image statistics, the proposed framework uses multi-level two-dimensional discrete wavelet transform (2D-DWT) modules to exploit scale-invariance and edge sparseness, which gives it the following advantages. Firstly, the fixed weights of wavelet modules do not add to the parameter count while reorganizing information based on these image priors. Secondly, the wavelet modules scale the spatial extents of feature maps by integral powers of 1/2×1/2, which reduces the memory and latency required for forward and backward passes. Finally, a multi-level 2D-DWT leads to a quicker expansion of the receptive field per layer than pooling (which we do not use) and it is a more effective spatial token mixer. WaveMix also generalizes better than other token mixing models, such as ConvMixer, MLP-Mixer, PoolFormer, random filters, and Fourier basis, because the wavelet transform is much better suited for image decomposition and spatial token mixing. WaveMix is a flexible model that can perform well on multiple image tasks without needing architectural modifications. WaveMix achieves a semantic segmentation mIoU of 83% on the Cityscapes validation set outperforming transformer and CNN-based architectures. We also demonstrate the advantages of WaveMix for classification on multiple datasets and show that WaveMix establishes new state-of-the-results in Places-365, EMNIST, and iNAT-mini datasets.
+### WaveMix-Lite
+![image](https://user-images.githubusercontent.com/15833382/226090664-d844e4f1-854a-43b3-8106-78307f187fe8.png)
+
+We propose WaveMix– a novel neural architecture for computer vision that is resource-efficient yet generalizable and scalable. WaveMix networks achieve comparable or better accuracy than the state-of-the-art convolutional neural networks, vision transformers, and token mixers for several tasks, establishing new benchmarks for segmentation on Cityscapes; and for classification on Places-365, f ive EMNIST datasets, and iNAT-mini. Remarkably, WaveMix architectures require fewer parameters to achieve these benchmarks compared to the previous state-of-the-art. Moreover, when controlled for the number of parameters, WaveMix requires lesser GPU RAM, which translates to savings in time, cost, and energy. To achieve these gains we used multi-level two-dimensional discrete wavelet transform (2D-DWT) in WaveMix blocks, which has the following advantages: (1) It reorganizes spatial information based on three strong image priors– scale-invariance, shift-invariance, and sparseness of edges, (2) in a lossless manner without adding parameters, (3) while also reducing the spatial sizes of feature maps, which reduces the memory and time required for forward and backward passes, and (4) expanding the receptive field faster than convolutions do. The whole architecture is a stack of self-similar and resolution-preserving WaveMix blocks, which allows architectural f lexibility for various tasks and levels of resource availability.
 
 
 | Task                  | Dataset     | Metric   | Value  |
@@ -66,23 +67,13 @@ url={https://openreview.net/forum?id=tBoSm4hUWV}
     primaryClass={cs.CV}
 }
 
-@misc{https://doi.org/10.48550/arxiv.2205.14375,
-  doi = {10.48550/ARXIV.2205.14375},
-  
-  url = {https://arxiv.org/abs/2205.14375},
-  
-  author = {Jeevan, Pranav and Viswanathan, Kavitha and S, Anandu A and Sethi, Amit},
-  
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), Artificial Intelligence (cs.AI), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences, I.2.10; I.4.0; I.4.1; I.4.2; I.4.6; I.4.7; I.4.8; I.4.9; I.4.10; I.2.10; I.5.1; I.5.2; I.5.4},
-  
-  title = {WaveMix: A Resource-efficient Neural Network for Image Analysis},
-  
-  publisher = {arXiv},
-  
-  year = {2022},
-  
-  copyright = {Creative Commons Attribution 4.0 International}
+@misc{jeevan2023wavemix,
+      title={WaveMix: A Resource-efficient Neural Network for Image Analysis}, 
+      author={Pranav Jeevan and Kavitha Viswanathan and Anandu A S and Amit Sethi},
+      year={2023},
+      eprint={2205.14375},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
-
 
 ```

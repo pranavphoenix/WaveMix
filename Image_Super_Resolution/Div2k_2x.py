@@ -64,7 +64,7 @@ class SuperResolutionDataset(Dataset):
 
 
 transform_img = transforms.Compose(
-        [transforms.Resize([512,512],interpolation = transforms.InterpolationMode.BICUBIC),
+        [transforms.Resize([256,256],
             transforms.ToTensor(),
             # transforms.Normalize((0.4485, 0.4375, 0.4046), (0.2698, 0.2557, 0.2802))
      ])
@@ -484,8 +484,8 @@ class WaveMix(nn.Module):
             self.layers.append(Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
         
         self.expand = nn.Sequential(
-            # nn.ConvTranspose2d(final_dim,int(final_dim/2), 4, stride=2, padding=1),
-            nn.Conv2d(final_dim, 3, 1)
+            nn.ConvTranspose2d(final_dim,int(final_dim/2), 4, stride=2, padding=1),
+            nn.Conv2d(int(final_dim/2), 3, 1)
         )
 
         self.conv = nn.Sequential(

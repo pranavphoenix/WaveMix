@@ -45,10 +45,102 @@ The high parameter efficiency is obtained by replacing Deconvolution layers with
 
 This is an implementation of code from the following papers : [Openreview Paper](https://openreview.net/forum?id=tBoSm4hUWV), [ArXiv Paper 1](https://arxiv.org/abs/2203.03689), [ArXiv Paper 2](https://arxiv.org/abs/2205.14375)
 
+## Install
+
+```bash
+$ pip install wavemix
+```
+
+## Usage
+### Semantic Segmentation
+
+```python
+import torch, wavemix
+from wavemix.SemSegment import WaveMix
+import torch
+
+model = WaveMix(
+    num_classes= 20, 
+    depth= 16,
+    mult= 2,
+    ff_channel= 256,
+    final_dim= 256,
+    dropout= 0.5,
+    level=4,
+    stride=2
+)
+
+img = torch.randn(1, 3, 256, 256)
+
+preds = model(img) # (1, 20, 256, 256)
+```
+
+### Image Classification
+
+```python
+import torch, wavemix
+from wavemix.classification import WaveMix
+import torch
+
+model = WaveMix(
+    num_classes= 1000, 
+    depth= 16,
+    mult= 2,
+    ff_channel= 192,
+    final_dim= 192,
+    dropout= 0.5,
+    level=3,
+    patch_size=4,
+)
+img = torch.randn(1, 3, 256, 256)
+
+preds = model(img) # (1, 1000)
+```
+
+### Single Image Super-resolution
+
+```python
+import wavemix, torch
+from wavemix.sisr import WaveMix
+
+model = WaveMix(
+    depth = 4,
+    mult = 2,
+    ff_channel = 144,
+    final_dim = 144,
+    dropout = 0.5,
+    level=1,
+)
+
+img = torch.randn(1, 3, 256, 256)
+out = model(img) # (1, 3, 512, 512)
+```
+
+## Parameters
+
+- `num_classes`: int.  
+Number of classes to classify/segment.
+- `depth`: int.  
+Number of WaveMix blocks.
+- `mult`: int.  
+Expansion of channels in the MLP (FeedForward) layer. 
+- `ff_channel`: int.  
+No. of output channels from the MLP (FeedForward) layer. 
+- `final_dim`: int.  
+Final dimension of output tensor after initial Conv layers. Channel dimension when tensor is fed to WaveBlocks.
+- `dropout`: float between `[0, 1]`, default `0.`.  
+Dropout rate. 
+- `level`: int.  
+Number of levels of 2D wavelet transform to be used in Waveblocks. 
+- `stride`: int.  
+Stride used in the initial convolutional layers to reduce the input resolution before being fed to Waveblocks. 
+- `initial_conv`: str.  
+Deciding between strided convolution or patchifying convolutions in the intial conv layer. Used for classification.
+- `patch_size`: int.  
+Size of each non-overlaping patch in case of patchifying convolution. Should be a multiple of 4.
 
 
-Please cite the following papers if you are using the WaveMix model
-
+#### Cite the following papers 
 ```
 @misc{
 p2022wavemix,

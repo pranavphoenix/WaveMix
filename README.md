@@ -131,7 +131,7 @@ Final dimension of output tensor after initial Conv layers. Channel dimension wh
 - `dropout`: float between `[0, 1]`, default `0.`.  
 Dropout rate. 
 - `level`: int.  
-Number of levels of 2D wavelet transform to be used in Waveblocks. 
+Number of levels of 2D wavelet transform to be used in Waveblocks. Currently supports levels from 1 to 4.
 - `stride`: int.  
 Stride used in the initial convolutional layers to reduce the input resolution before being fed to Waveblocks. 
 - `initial_conv`: str.  

@@ -64,7 +64,7 @@ class SuperResolutionDataset(Dataset):
 
 
 transform_img = transforms.Compose(
-        [transforms.Resize([256,256],
+        [transforms.Resize([256,256]),
             transforms.ToTensor(),
             # transforms.Normalize((0.4485, 0.4375, 0.4046), (0.2698, 0.2557, 0.2802))
      ])

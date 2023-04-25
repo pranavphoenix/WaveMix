@@ -116,6 +116,14 @@ img = torch.randn(1, 3, 256, 256)
 out = model(img) # (1, 3, 512, 512)
 ```
 
+### To use a single Waveblock
+
+```python
+import wavemix, torch
+from wavemix import Level1Waveblock
+
+```
+
 ## Parameters
 
 - `num_classes`: int.  

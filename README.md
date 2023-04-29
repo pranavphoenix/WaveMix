@@ -143,7 +143,7 @@ Number of levels of 2D wavelet transform to be used in Waveblocks. Currently sup
 - `stride`: int.  
 Stride used in the initial convolutional layers to reduce the input resolution before being fed to Waveblocks. 
 - `initial_conv`: str.  
-Deciding between strided convolution or patchifying convolutions in the intial conv layer. Used for classification.
+Deciding between strided convolution or patchifying convolutions in the intial conv layer. Used for classification. 'pachify' or 'strided'.
 - `patch_size`: int.  
 Size of each non-overlaping patch in case of patchifying convolution. Should be a multiple of 4.
 

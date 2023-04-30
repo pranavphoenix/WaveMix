@@ -12,3 +12,6 @@ model = WaveMix(
     stride = 1
 
 )
+
+#weights available at url
+https://github.com/pranavphoenix/WaveMix/raw/main/Saved_weights/cifar10/cifar10_94.58.pth

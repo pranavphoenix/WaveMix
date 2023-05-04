@@ -42,7 +42,9 @@ batch_size = 512
 
 # transforms
 transform_train = transforms.Compose(
-        [ transforms.ToTensor(),
+        [ transforms.RandomHorizontalFlip(p=0.5),
+            transforms.TrivialAugmentWide(),
+            transforms.ToTensor(),
      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))])
 
 transform_test = transforms.Compose(

@@ -145,7 +145,7 @@ print('Training with SGD')
 model.load_state_dict(torch.load(PATH))
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-for epoch in range(50):  # loop over the dataset multiple times
+while counter < 20: # loop over the dataset multiple times
     t0 = time.time()
     epoch_accuracy = 0
     epoch_loss = 0
@@ -190,10 +190,13 @@ for epoch in range(50):  # loop over the dataset multiple times
     top5.append(correct_5*100/c)
     traintime.append(t1 - t0)
     testtime.append(time.time() - t1)
+    counter += 1
+    epoch += 1
     if float(correct_1*100/c) >= float(max(top1)):
         PATH = 'model.pth'
         torch.save(model.state_dict(), PATH)
         print(1)
+        counter = 0
         
 print('Finished Training')
 print("Results")

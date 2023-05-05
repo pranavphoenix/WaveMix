@@ -1,4 +1,4 @@
-from wavemix.classification import WaveMix
+Model Configuration:
 
 model = WaveMix(
     num_classes = 10,
@@ -13,5 +13,7 @@ model = WaveMix(
 
 )
 
-#weights available at url
-https://github.com/pranavphoenix/WaveMix/raw/main/Saved_weights/cifar10/cifar10_94.58.pth
+
+Model weights can be downloaded from:
+
+https://huggingface.co/cloudwalker/wavemix/resolve/main/Saved_Models_Weights/cifar10/cifar10_94.58.pth

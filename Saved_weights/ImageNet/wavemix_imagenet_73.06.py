@@ -15,6 +15,6 @@ model = WaveMix(
 )
 
 
-url = 'https://huggingface.co/cloudwalker/wavemix/resolve/main/Saved_Models_Weights/ImageNet/imagenet_71.49.pth'
+url = 'https://huggingface.co/cloudwalker/wavemix/resolve/main/Saved_Models_Weights/ImageNet/wavemixlevel3_192_16_73.06.pth'
 
 model.load_state_dict(torch.hub.load_state_dict_from_url(url))

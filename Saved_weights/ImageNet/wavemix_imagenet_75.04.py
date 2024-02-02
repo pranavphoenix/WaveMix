@@ -11,10 +11,8 @@ model = WaveMix(
     level = 3,
     initial_conv = 'pachify',
     patch_size = 4
-
 )
 
-
-url = 'https://huggingface.co/cloudwalker/wavemix/resolve/main/Saved_Models_Weights/ImageNet/wavemixlevel3_192_16_73.06.pth'
+url = 'https://huggingface.co/cloudwalker/wavemix/resolve/main/Saved_Models_Weights/ImageNet/wavemix_192_16_75.04.pth'
 
 model.load_state_dict(torch.hub.load_state_dict_from_url(url))

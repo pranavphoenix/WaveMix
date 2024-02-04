@@ -31,7 +31,7 @@ We propose WaveMix– a novel neural architecture for computer vision that is re
 | Task                  | Dataset     | Metric   | Value  |
 |-----------------------|-------------|----------|--------|
 | Semantic Segmentation | Cityscapes  | Single-scale mIoU     | 82.70% (SOTA) |
-| Image Classification  | ImageNet-1k | Accuracy | 74.93% |
+| Image Classification  | ImageNet-1k | Accuracy | 75.32% |
 
 ### Parameter Efficiency
 | Task                         | Model                                           | Parameters |

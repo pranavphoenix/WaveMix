@@ -365,11 +365,14 @@ from numpy.lib.function_base import hamming
 
 
 def get_dwt_filters(level, mode='zero', wave='db1'):   
-    xf1 = DWTForward(J=1, mode=mode, wave=wave)    
-    xf2 = DWTForward(J=2, mode=mode, wave=wave)    
-    xf3 = DWTForward(J=3, mode=mode, wave=wave)   
-    xf4 = DWTForward(J=4, mode=mode, wave=wave)
-    return [xf1, xf2, xf3, xf4][:level]
+    xf = []
+    for j in range(1,level+1,1):
+        xf.append(DWTForward(J=j, mode=mode, wave=wave)
+                  
+    if level == 1: 
+        xf = xf[0]
+        
+    return xf
 
 
 class Level1Waveblock(nn.Module):

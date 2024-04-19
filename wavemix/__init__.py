@@ -367,7 +367,7 @@ from numpy.lib.function_base import hamming
 def get_dwt_filters(level, mode='zero', wave='db1'):   
     xf = []
     for j in range(1,level+1,1):
-        xf.append(DWTForward(J=j, mode=mode, wave=wave)
+        xf.append(DWTForward(J=j, mode=mode, wave=wave))
                   
     if level == 1: 
         xf = xf[0]

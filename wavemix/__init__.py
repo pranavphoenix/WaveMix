@@ -162,7 +162,7 @@ def afb1d(x, h0, h1, mode='zero', dim=-1):
             N += 1
         x = roll(x, -L2, dim=d)
         pad = (L-1, 0) if d == 2 else (0, L-1)
-        lohi = F.conv2d(x, h, padding=pad, stride=s, groups=C)
+        lohi = F.conv2d(x, h.to(x.device), padding=pad, stride=s, groups=C)
         N2 = N//2
         if d == 2:
             lohi[:,:,:L2] = lohi[:,:,:L2] + lohi[:,:,N2:N2+L2]
@@ -183,11 +183,11 @@ def afb1d(x, h0, h1, mode='zero', dim=-1):
                 x = F.pad(x, pad)
             pad = (p//2, 0) if d == 2 else (0, p//2)
             # Calculate the high and lowpass
-            lohi = F.conv2d(x, h, padding=pad, stride=s, groups=C)
+            lohi = F.conv2d(x, h.to(x.device), padding=pad, stride=s, groups=C)
         elif mode == 'symmetric' or mode == 'reflect' or mode == 'periodic':
             pad = (0, 0, p//2, (p+1)//2) if d == 2 else (p//2, (p+1)//2, 0, 0)
             x = mypad(x, pad=pad, mode=mode)
-            lohi = F.conv2d(x, h, stride=s, groups=C)
+            lohi = F.conv2d(x, h.to(x.device), stride=s, groups=C)
         else:
             raise ValueError("Unkown pad type: {}".format(mode))
 
@@ -362,11 +362,14 @@ class DWTForward(nn.Module):
 
 
 from numpy.lib.function_base import hamming
-   
-xf1 = DWTForward(J=1, mode='zero', wave='db1')    
-xf2 = DWTForward(J=2, mode='zero', wave='db1')    
-xf3 = DWTForward(J=3, mode='zero', wave='db1')   
-xf4 = DWTForward(J=4, mode='zero', wave='db1')    
+
+
+def get_dwt_filters(level, mode='zero', wave='db1'):   
+    xf1 = DWTForward(J=1, mode=mode, wave=wave)    
+    xf2 = DWTForward(J=2, mode=mode, wave=wave)    
+    xf3 = DWTForward(J=3, mode=mode, wave=wave)   
+    xf4 = DWTForward(J=4, mode=mode, wave=wave)
+    return [xf1, xf2, xf3, xf4][:level]
 
 
 class Level1Waveblock(nn.Module):
@@ -392,14 +395,15 @@ class Level1Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1 = get_dwt_filters(level=1)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
+        Y1, Yh = self.xf1(x)
         
         x = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
         
@@ -440,15 +444,16 @@ class Level2Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2 = get_dwt_filters(level=2)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
 
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
@@ -504,16 +509,17 @@ class Level3Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2, self.xf3 = get_dwt_filters(level=3)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
-        Y3, Yh = xf3(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
+        Y3, Yh = self.xf3(x)
         
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
@@ -587,17 +593,18 @@ class Level4Waveblock(nn.Module):
             )    
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2, self.xf3, self.xf4 = get_dwt_filters(level=4)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
   
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
-        Y3, Yh = xf3(x)
-        Y4, Yh = xf4(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
+        Y3, Yh = self.xf3(x)
+        Y4, Yh = self.xf4(x)
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
         x2 = torch.reshape(Yh[1], (b, int(c*3/4), int(h/4), int(w/4)))

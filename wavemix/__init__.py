@@ -8,8 +8,6 @@ from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 def sfb1d(lo, hi, g0, g1, mode='zero', dim=-1):
     """ 1D synthesis filter bank of an image tensor
     """
@@ -57,6 +55,7 @@ def sfb1d(lo, hi, g0, g1, mode='zero', dim=-1):
 
     return y
 
+
 def reflect(x, minx, maxx):
     """Reflect the values in matrix *x* about the scalar values *minx* and
     *maxx*.  Hence a vector *x* containing a long linearly increasing series is
@@ -73,6 +72,7 @@ def reflect(x, minx, maxx):
     normed_mod = np.where(mod < 0, mod + rng_by_2, mod)
     out = np.where(normed_mod >= rng, rng_by_2 - normed_mod, normed_mod) + minx
     return np.array(out, dtype=x.dtype)
+
 
 def mode_to_int(mode):
     if mode == 'zero':
@@ -92,6 +92,7 @@ def mode_to_int(mode):
     else:
         raise ValueError("Unkown pad type: {}".format(mode))
 
+
 def int_to_mode(mode):
     if mode == 0:
         return 'zero'
@@ -109,6 +110,7 @@ def int_to_mode(mode):
         return 'periodic'
     else:
         raise ValueError("Unkown pad type: {}".format(mode))
+
 
 def afb1d(x, h0, h1, mode='zero', dim=-1):
     """ 1D analysis filter bank (along one dimension only) of an image
@@ -192,7 +194,6 @@ def afb1d(x, h0, h1, mode='zero', dim=-1):
     return lohi
 
 
-
 class AFB2D(Function):
     """ Does a single level 2d wavelet decomposition of an input. Does separate
     row and column filtering by two calls to
@@ -245,7 +246,7 @@ class AFB2D(Function):
         return dx, None, None, None, None, None
 
 
-def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device=device):
+def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device='cpu'):
     """
     Prepares the filters to be of the right form for the afb2d function.  In
     particular, makes the tensors the right shape. It takes mirror images of
@@ -274,7 +275,7 @@ def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device=device):
     return h0_col, h1_col, h0_row, h1_row
 
 
-def prep_filt_afb1d(h0, h1, device=device):
+def prep_filt_afb1d(h0, h1, device='cpu'):
     """
     Prepares the filters to be of the right form for the afb2d function.  In
     particular, makes the tensors the right shape. It takes mirror images of
@@ -289,9 +290,10 @@ def prep_filt_afb1d(h0, h1, device=device):
     h0 = np.array(h0[::-1]).ravel()
     h1 = np.array(h1[::-1]).ravel()
     t = torch.get_default_dtype()
-    h0 = torch.tensor(h0, device=device, dtype=t).reshape((1, 1, -1))
-    h1 = torch.tensor(h1, device=device, dtype=t).reshape((1, 1, -1))
+    h0 = torch.tensor(h0, device='cpu', dtype=t).reshape((1, 1, -1))
+    h1 = torch.tensor(h1, device='cpu', dtype=t).reshape((1, 1, -1))
     return h0, h1
+
 
 class DWTForward(nn.Module):
     """ Performs a 2d DWT Forward decomposition of an image
@@ -358,12 +360,14 @@ class DWTForward(nn.Module):
 
         return ll, yh
 
+
 from numpy.lib.function_base import hamming
    
-xf1 = DWTForward(J=1, mode='zero', wave='db1').to(device)    
-xf2 = DWTForward(J=2, mode='zero', wave='db1').to(device)    
-xf3 = DWTForward(J=3, mode='zero', wave='db1').to(device)   
-xf4 = DWTForward(J=4, mode='zero', wave='db1').to(device)    
+xf1 = DWTForward(J=1, mode='zero', wave='db1')    
+xf2 = DWTForward(J=2, mode='zero', wave='db1')    
+xf3 = DWTForward(J=3, mode='zero', wave='db1')   
+xf4 = DWTForward(J=4, mode='zero', wave='db1')    
+
 
 class Level1Waveblock(nn.Module):
     def __init__(
@@ -405,6 +409,7 @@ class Level1Waveblock(nn.Module):
         
         return x
     
+
 class Level2Waveblock(nn.Module):
     def __init__(
         self,

@@ -3,6 +3,8 @@ WaveMix models for image classification.
 Some implementations are modified from:
 timm (https://github.com/rwightman/pytorch-image-models),
 MambaOut (https://github.com/yuweihao/MambaOut/blob/main/models/mambaout.py)
+
+Also add in the models/init file in timm
 """
 from functools import partial
 import torch

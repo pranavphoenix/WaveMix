@@ -100,3 +100,4 @@ print('Finished Training')
 
 print("Results")
 print(f"Top 1 Accuracy: {max(top1):.2f} -Top 5 Accuracy : {max(top5):.2f} - Train Time: {min(traintime):.0f} -Test Time: {min(testtime):.0f}\n")
+

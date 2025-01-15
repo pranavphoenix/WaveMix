@@ -2,6 +2,7 @@ from wavemix import Level4Waveblock, Level3Waveblock, Level2Waveblock, Level1Wav
 import torch.nn as nn
 from einops.layers.torch import Rearrange
 
+
 class WaveMix(nn.Module):
     def __init__(
         self,
@@ -22,14 +23,14 @@ class WaveMix(nn.Module):
         
         self.layers = nn.ModuleList([])
         for _ in range(depth): 
-                if level == 4:
-                    self.layers.append(Level4Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
-                elif level == 3:
-                    self.layers.append(Level3Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
-                elif level == 2:
-                    self.layers.append(Level2Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
-                else:
-                    self.layers.append(Level1Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+            if level == 4:
+                self.layers.append(Level4Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+            elif level == 3:
+                self.layers.append(Level3Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+            elif level == 2:
+                self.layers.append(Level2Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
+            else:
+                self.layers.append(Level1Waveblock(mult = mult, ff_channel = ff_channel, final_dim = final_dim, dropout = dropout))
         
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -49,8 +50,7 @@ class WaveMix(nn.Module):
             nn.Conv2d(int(final_dim/2), final_dim, patch_size, patch_size),
             nn.GELU(),
             nn.BatchNorm2d(final_dim)
-            )
-        
+            )  
 
     def forward(self, img):
         x = self.conv(img)   

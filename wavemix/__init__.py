@@ -8,8 +8,6 @@ from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 def sfb1d(lo, hi, g0, g1, mode='zero', dim=-1):
     """ 1D synthesis filter bank of an image tensor
     """
@@ -57,6 +55,7 @@ def sfb1d(lo, hi, g0, g1, mode='zero', dim=-1):
 
     return y
 
+
 def reflect(x, minx, maxx):
     """Reflect the values in matrix *x* about the scalar values *minx* and
     *maxx*.  Hence a vector *x* containing a long linearly increasing series is
@@ -73,6 +72,7 @@ def reflect(x, minx, maxx):
     normed_mod = np.where(mod < 0, mod + rng_by_2, mod)
     out = np.where(normed_mod >= rng, rng_by_2 - normed_mod, normed_mod) + minx
     return np.array(out, dtype=x.dtype)
+
 
 def mode_to_int(mode):
     if mode == 'zero':
@@ -92,6 +92,7 @@ def mode_to_int(mode):
     else:
         raise ValueError("Unkown pad type: {}".format(mode))
 
+
 def int_to_mode(mode):
     if mode == 0:
         return 'zero'
@@ -109,6 +110,7 @@ def int_to_mode(mode):
         return 'periodic'
     else:
         raise ValueError("Unkown pad type: {}".format(mode))
+
 
 def afb1d(x, h0, h1, mode='zero', dim=-1):
     """ 1D analysis filter bank (along one dimension only) of an image
@@ -160,7 +162,7 @@ def afb1d(x, h0, h1, mode='zero', dim=-1):
             N += 1
         x = roll(x, -L2, dim=d)
         pad = (L-1, 0) if d == 2 else (0, L-1)
-        lohi = F.conv2d(x, h, padding=pad, stride=s, groups=C)
+        lohi = F.conv2d(x, h.to(x.device), padding=pad, stride=s, groups=C)
         N2 = N//2
         if d == 2:
             lohi[:,:,:L2] = lohi[:,:,:L2] + lohi[:,:,N2:N2+L2]
@@ -181,16 +183,15 @@ def afb1d(x, h0, h1, mode='zero', dim=-1):
                 x = F.pad(x, pad)
             pad = (p//2, 0) if d == 2 else (0, p//2)
             # Calculate the high and lowpass
-            lohi = F.conv2d(x, h, padding=pad, stride=s, groups=C)
+            lohi = F.conv2d(x, h.to(x.device), padding=pad, stride=s, groups=C)
         elif mode == 'symmetric' or mode == 'reflect' or mode == 'periodic':
             pad = (0, 0, p//2, (p+1)//2) if d == 2 else (p//2, (p+1)//2, 0, 0)
             x = mypad(x, pad=pad, mode=mode)
-            lohi = F.conv2d(x, h, stride=s, groups=C)
+            lohi = F.conv2d(x, h.to(x.device), stride=s, groups=C)
         else:
             raise ValueError("Unkown pad type: {}".format(mode))
 
     return lohi
-
 
 
 class AFB2D(Function):
@@ -245,7 +246,7 @@ class AFB2D(Function):
         return dx, None, None, None, None, None
 
 
-def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device=device):
+def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device='cpu'):
     """
     Prepares the filters to be of the right form for the afb2d function.  In
     particular, makes the tensors the right shape. It takes mirror images of
@@ -274,7 +275,7 @@ def prep_filt_afb2d(h0_col, h1_col, h0_row=None, h1_row=None, device=device):
     return h0_col, h1_col, h0_row, h1_row
 
 
-def prep_filt_afb1d(h0, h1, device=device):
+def prep_filt_afb1d(h0, h1, device='cpu'):
     """
     Prepares the filters to be of the right form for the afb2d function.  In
     particular, makes the tensors the right shape. It takes mirror images of
@@ -292,6 +293,7 @@ def prep_filt_afb1d(h0, h1, device=device):
     h0 = torch.tensor(h0, device=device, dtype=t).reshape((1, 1, -1))
     h1 = torch.tensor(h1, device=device, dtype=t).reshape((1, 1, -1))
     return h0, h1
+
 
 class DWTForward(nn.Module):
     """ Performs a 2d DWT Forward decomposition of an image
@@ -358,12 +360,20 @@ class DWTForward(nn.Module):
 
         return ll, yh
 
+
 from numpy.lib.function_base import hamming
-   
-xf1 = DWTForward(J=1, mode='zero', wave='db1').to(device)    
-xf2 = DWTForward(J=2, mode='zero', wave='db1').to(device)    
-xf3 = DWTForward(J=3, mode='zero', wave='db1').to(device)   
-xf4 = DWTForward(J=4, mode='zero', wave='db1').to(device)    
+
+
+def get_dwt_filters(level, mode='zero', wave='db1'):   
+    xf = []
+    for j in range(1,level+1,1):
+        xf.append(DWTForward(J=j, mode=mode, wave=wave))
+                  
+    if level == 1: 
+        xf = xf[0]
+        
+    return xf
+
 
 class Level1Waveblock(nn.Module):
     def __init__(
@@ -388,14 +398,15 @@ class Level1Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1 = get_dwt_filters(level=1)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
+        Y1, Yh = self.xf1(x)
         
         x = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
         
@@ -405,6 +416,7 @@ class Level1Waveblock(nn.Module):
         
         return x
     
+
 class Level2Waveblock(nn.Module):
     def __init__(
         self,
@@ -435,15 +447,16 @@ class Level2Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2 = get_dwt_filters(level=2)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
 
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
@@ -499,16 +512,17 @@ class Level3Waveblock(nn.Module):
             )
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2, self.xf3 = get_dwt_filters(level=3)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
         
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
-        Y3, Yh = xf3(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
+        Y3, Yh = self.xf3(x)
         
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
@@ -582,17 +596,18 @@ class Level4Waveblock(nn.Module):
             )    
 
         self.reduction = nn.Conv2d(final_dim, int(final_dim/4), 1)
-        
+        self.xf1, self.xf2, self.xf3, self.xf4 = get_dwt_filters(level=4)
+
         
     def forward(self, x):
         b, c, h, w = x.shape
   
         x = self.reduction(x)
         
-        Y1, Yh = xf1(x)
-        Y2, Yh = xf2(x)
-        Y3, Yh = xf3(x)
-        Y4, Yh = xf4(x)
+        Y1, Yh = self.xf1(x)
+        Y2, Yh = self.xf2(x)
+        Y3, Yh = self.xf3(x)
+        Y4, Yh = self.xf4(x)
         
         x1 = torch.reshape(Yh[0], (b, int(c*3/4), int(h/2), int(w/2)))
         x2 = torch.reshape(Yh[1], (b, int(c*3/4), int(h/4), int(w/4)))
